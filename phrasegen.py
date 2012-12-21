@@ -47,15 +47,20 @@ class ThreadUrl (threading.Thread):
 	def run (self):
 		  while True:
 		      #grabs host from queue
-		      url = self.queue.get ()
+		      url=None
 		      text=""
+		      if self.queue != None:
+		        url = self.queue.get ()
+
 		      try:
-		        myopener = MyOpener ()
-		        #page = urllib.urlopen(url)
-		        page = myopener.open (url)
-		        Dout ("url %s" % url				 )
-		        text = page.read ()
-		        page.close ()
+		        if url != None:
+		          myopener = MyOpener ()
+		          #page = urllib.urlopen(url)
+		          page = myopener.open (url)
+		          Dout ("url %s" % url)
+		        if page:
+		          text = page.read ()
+		          page.close ()
 		      except Exception, e: 
 		        Dout (url + " "  + str(e))
 
@@ -79,10 +84,10 @@ class DatamineThread(threading.Thread):
             #grabs host from queue
             text = self.out_queue.get()
 
-            #parse the chunk
-            #soup = BeautifulSoup(chunk)
-            #'print soup.findAll(['title'])
-            self.stilized_queue.put(stilize_page(text))
+            try:
+              self.stilized_queue.put(stilize_page(text))
+            except Exception, e:
+              Dout (str(e))
 
             #signals to queue job is done
             self.out_queue.task_done()
@@ -331,37 +336,40 @@ def main (default_urls=False):
 
     thethreads = []
 
+    local_urls = options.urls.split()
+    urlcount = len(local_urls)
+
     try:
 
-      for u in options.urls.split():
-        #print u
-			  queue_urls.put (u.strip())
-
+      #Dout("Thread count: %d" % urlcount)
 
 		  #spawn a pool of threads, and pass them queue instance
-      for i in range(10):
+      for i in range(urlcount):
           t = ThreadUrl (queue_urls, queue_content)
+          thethreads.append(t)
           t.setDaemon (True)
           t.start()
-          thethreads.append(t)
+
 
     except Exception, e:
       Dout ( str(e) + " exception at urls" ) 
+      for t in thethreads:
+        t.stop()
 
-    #populate queue with data
-    #for host in hosts:
-    #    queue.put(host)
+    for u in local_urls:
+	    queue_urls.put (u.strip())
 
     try:
 
-      for i in range(5):
+      for i in range(urlcount):
           dt = DatamineThread (queue_content, queue_content_stilized)
           dt.setDaemon (True)
           dt.start()
           thethreads.append(dt)
     except Exception, e:
+      for t in thethreads:
+        t.stop()
       Dout ( str(e) + " exception at datamine " ) 
-
 
     #wait on the queue until everything has been processed
     queue_urls.join()
