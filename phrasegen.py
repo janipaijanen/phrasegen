@@ -3,9 +3,12 @@
 #
 # Phrase generator (phrasegen) for creating random(?) password phrases from given input, file or urls.
 #
-# Copyright (C) 2012 Jani Päijänen, jani dot paijanen [at] gmail dot com
-# License: Freeware. 
-# Please consider making a donation to some local charity program near you.
+# Copyright (C) 2012 Jani Päijänen
+# All rights reserved.
+#  
+# License: Simplified BSD License
+#
+#
 
 
 import random
