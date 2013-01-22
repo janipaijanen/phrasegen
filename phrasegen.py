@@ -44,6 +44,8 @@ class ThreadUrl (threading.Thread):
 		  self.queue = queue
 		  self.out_queue = out_queue
 
+		  Dout ("ThreadURL %s" % u"constructor")
+
 	def run (self):
 		  while True:
 		      #grabs host from queue
@@ -54,10 +56,11 @@ class ThreadUrl (threading.Thread):
 
 		      try:
 		        if url != None:
+		          Dout ("ThreadURL %s" % url)
 		          myopener = MyOpener ()
 		          #page = urllib.urlopen(url)
 		          page = myopener.open (url)
-		          Dout ("url %s" % url)
+		          
 		        if page:
 		          text = page.read ()
 		          page.close ()
@@ -96,7 +99,7 @@ def fetch_url(url):
 	myopener = MyOpener()
 	#page = urllib.urlopen(url)
 	page = myopener.open(url)
-	 
+	  
 	text = page.read()
 	page.close()
 	return stilize_page(text)
@@ -144,28 +147,54 @@ def Dout(msg, level=5):
   print (msg)
   pass
 
-def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, db=None, fout=None):
+def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, swap=False, db=None, fout=None):
 
   contents = []
-  #Dout data
   for line in data:
     liner = []
     i=0
     if line == None: continue
     for w in line.split():
   	  l = len(w)
-  	  
+  	  tmp = ""
+
   	  if ( (cut_long_for_minlimit == True) and l >= min_length) : 
   	    if (cut_long_for_maxlimit == False):
 	        if l <= max_length:
-  	    	  liner.append(w)
+  	    	  tmp=w
   	    	  i=1
   	    else:
- 	    	  liner.append(w[:max(min_length, max_length)])
+  	    	  tmp=w[:max(min_length, max_length)]
  	    	  i=1
   	  elif (cut_long_for_minlimit == False):
-  	    liner.append(w[:min(min_length, max_length)])
+  	    tmp=w[:min(min_length, max_length)]
   	    i=1
+
+  	  l = len(tmp)
+  	  if swap == True and l>0:
+
+        # allow swapping all but first and last chars, if long enough
+  	    if l-2 > 0:
+  	      ma=random.randint(1,l-2)
+  	      mi=random.randint(1,l-2)
+  	    else:
+  	      ma = 0
+  	      mi = 0
+
+  	    if ma < mi:
+  	      tma=ma
+  	      ma=mi
+  	      mi=tma
+        
+  	    if ma != mi and mi<l and ma>0:
+  	      tchr = tmp[:mi]
+  	      tchr += tmp[ma]
+  	      tchr += tmp[mi+1:ma]
+  	      tchr += tmp[mi]
+  	      tchr += tmp[ma+1:]
+  	      tmp = tchr
+
+  	  liner.append(tmp)
 
     if i > 0:
       contents += liner
@@ -249,6 +278,9 @@ def main (default_urls=False):
 
   parser.add_option ( "--stdin", dest="stdin", default=False, 
                     action="store_true", help="Read from stdin")
+
+  parser.add_option ( "--swap", dest="swap", default=False, 
+                    action="store_true", help="Swap random chars")
 
   parser.add_option ( "--fout", dest="fout", default=None, 
                     action="store", type="string", help="File out")
@@ -391,7 +423,7 @@ def main (default_urls=False):
     #  data.append ( fetch_url(u))
     #print (data, options.wordscount, options.minword, options.maxword)
 
-  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.fout)
+  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.swap, options.fout)
 	
 
 if __name__ == "__main__":
