@@ -17,6 +17,9 @@ import urllib
 import urlparse
 import Queue
 import threading
+import re
+
+
 try:
 	from BeautifulSoup import BeautifulSoup, Comment
 except ImportError, e:
@@ -147,16 +150,22 @@ def Dout(msg, level=5):
   print (msg)
   pass
 
-def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, swap=False, db=None, fout=None):
+def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, swap=False, ease_swap=False, db=None, fout=None):
 
   contents = []
   for line in data:
     liner = []
     i=0
-    if line == None: continue
-    for w in line.split():
+    if line == None : continue    
+
+    line = re.sub("\s\s+" , " ", line)
+
+    if len(line) == 0: continue
+
+    tmp = ""
+    for w in line.strip().split():
   	  l = len(w)
-  	  tmp = ""
+  	  if l == 0: continue
 
   	  if ( (cut_long_for_minlimit == True) and l >= min_length) : 
   	    if (cut_long_for_maxlimit == False):
@@ -171,12 +180,22 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
   	    i=1
 
   	  l = len(tmp)
-  	  if swap == True and l>0:
+  	  do_swap = False
+
+  	  if swap == True:
+  	    if ease_swap == True:
+  	      do_swap = random.randint(0,3) >= 2
+  	    else:
+  	      do_swap = True
+      
+        
+  	  if swap == True and l>4 and do_swap == True:
+  	    #Dout ("D")  
 
         # allow swapping all but first and last chars, if long enough
   	    if l-2 > 0:
-  	      ma=random.randint(1,l-2)
-  	      mi=random.randint(1,l-2)
+  	      ma=random.randint(1, l-2)
+  	      mi=random.randint(1, l-2)
   	    else:
   	      ma = 0
   	      mi = 0
@@ -193,8 +212,12 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
   	      tchr += tmp[mi]
   	      tchr += tmp[ma+1:]
   	      tmp = tchr
+          #if len (tmp) == 0:
+            #i=0
+            #Dout("-%s-%d  %s" % (tmp, len(tmp), w ) )
+            #continue
 
-  	  liner.append(tmp)
+  	  liner.append( tmp )
 
     if i > 0:
       contents += liner
@@ -208,18 +231,17 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
     r = 0
     while r < words_count:
       index = random.randint(0, con_length-1)
-      #element = random.choice(contents)
+      
       element = contents.pop(index)
       con_length = len(contents)
       if  con_length <= 1 : break
-      #contents.remove(element)
 
       if len(line) > 0:
         line = line + " " + element
       else:
         line = element
       r += 1 
-    
+
     result.append(line)
 
   if fout!=None:
@@ -281,6 +303,10 @@ def main (default_urls=False):
 
   parser.add_option ( "--swap", dest="swap", default=False, 
                     action="store_true", help="Swap random chars")
+
+  parser.add_option ( "--ease_swap", dest="ease_swap", default=False, 
+                    action="store_true", help="Swap only random words")
+
 
   parser.add_option ( "--fout", dest="fout", default=None, 
                     action="store", type="string", help="File out")
@@ -423,7 +449,7 @@ def main (default_urls=False):
     #  data.append ( fetch_url(u))
     #print (data, options.wordscount, options.minword, options.maxword)
 
-  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.swap, options.fout)
+  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.swap, options.ease_swap, options.fout)
 	
 
 if __name__ == "__main__":
