@@ -50,7 +50,7 @@ class ThreadUrl (threading.Thread):
 		  self.queue = queue
 		  self.out_queue = out_queue
 
-		  Dout ("ThreadURL %s" % u"constructor")
+		  #Dout ("ThreadURL %s" % u"constructor")
 
 	def run (self):
 		  while True:
@@ -62,7 +62,7 @@ class ThreadUrl (threading.Thread):
 
 		      try:
 		        if url != None:
-		          Dout ("ThreadURL %s" % url)
+		          #Dout ("ThreadURL %s" % url)
 		          myopener = MyOpener ()
 		          #page = urllib.urlopen(url)
 		          page = myopener.open (url)
@@ -304,11 +304,11 @@ def main (default_urls=False):
   parser.add_option ( "--stdin", dest="stdin", default=False, 
                     action="store_true", help="Read from stdin")
 
-  parser.add_option ( "--swap", dest="swap", default=False, 
-                    action="store_true", help="Swap random chars")
+  parser.add_option ( "--no-swap", dest="swap", default=True, 
+                    action="store_false", help="Do not swap random chars")
 
-  parser.add_option ( "--ease_swap", dest="ease_swap", default=False, 
-                    action="store_true", help="Swap only random words")
+  parser.add_option ( "--no-ease_swap", dest="ease_swap", default=True, 
+                    action="store_false", help="Do not swap only chars of some words")
 
 
   parser.add_option ( "--fout", dest="fout", default=None, 
