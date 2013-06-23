@@ -324,14 +324,14 @@ def main (default_urls=False):
       data.append (line)
     #randomize_filecontents(data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit)
     f.close()
-  elif options.stdin == True:
+  if options.stdin == True:
     #data = []
     for line in sys.stdin:
       line = line.strip()
       if len (line) == 0: continue
       data.append (line)
     #randomize_filecontents(data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit)
-  elif options.urls != None:
+  if options.urls != None:
     #data = []
 
     thethreads = []
