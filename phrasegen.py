@@ -44,7 +44,6 @@ def Dout(msg=None):
   print (msg)
 
 class ThreadUrl (threading.Thread):
-<<<<<<< HEAD
   """Threaded Url Grab"""
   def __init__ (self, queue, out_queue):
       threading.Thread.__init__ (self)
@@ -77,43 +76,6 @@ class ThreadUrl (threading.Thread):
 
           #signals to queue job is done
           self.queue.task_done ()
-=======
-	"""Threaded Url Grab"""
-	def __init__ (self, queue, out_queue):
-		  threading.Thread.__init__ (self)
-		  self.queue = queue
-		  self.out_queue = out_queue
-
-		  #Dout ("ThreadURL %s" % u"constructor")
-
-	def run (self):
-		  while True:
-		      #grabs host from queue
-		      url=None
-		      text=""
-		      if self.queue != None:
-		        url = self.queue.get ()
-
-		      try:
-		        if url != None:
-		          #Dout ("ThreadURL %s" % url)
-		          myopener = MyOpener ()
-		          #page = urllib.urlopen(url)
-		          page = myopener.open (url)
-		          
-		        if page:
-		          text = page.read ()
-		          page.close ()
-		      except Exception, e: 
-		        Dout (url + " "  + str(e))
-
-
-		      #place chunk into out queue
-		      self.out_queue.put (text)
-
-		      #signals to queue job is done
-		      self.queue.task_done ()
->>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
 
 class DatamineThread(threading.Thread):
     """Threaded Url Grab"""
@@ -137,7 +99,6 @@ class DatamineThread(threading.Thread):
             self.out_queue.task_done()
 
 def fetch_url(url):
-<<<<<<< HEAD
   myopener = MyOpener()
   #page = urllib.urlopen(url)
   page = myopener.open(url)
@@ -145,15 +106,6 @@ def fetch_url(url):
   text = page.read()
   page.close()
   return stilize_page(text)
-=======
-	myopener = MyOpener()
-	#page = urllib.urlopen(url)
-	page = myopener.open(url)
-	  
-	text = page.read()
-	page.close()
-	return stilize_page(text)
->>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
 
 def stilize_page(text):
   try:
@@ -204,86 +156,44 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
   for line in data:
     liner = []
     i=0
-<<<<<<< HEAD
-    if line == None: continue
-    for w in line.split():
-      l = len(w)
-      
-      if ( (cut_long_for_minlimit == True) and l >= min_length) : 
-        if (cut_long_for_maxlimit == False):
-          if l <= max_length:
-            liner.append(w)
-            i=1
-        else:
-          liner.append(w[:max(min_length, max_length)])
-          i=1
-      elif (cut_long_for_minlimit == False):
-        liner.append(w[:min(min_length, max_length)])
-        i=1
-=======
+
     if line == None : continue    
 
-    line = re.sub("\s\s+" , " ", line)
+    line = re.sub(r"\s\s+" , " ", line)
 
     if len(line) == 0: continue
 
     tmp = ""
     for w in line.strip().split():
-  	  l = len(w)
-  	  if l == 0: continue
+      l = len(w)
+      if l == 0: continue
 
-  	  if ( (cut_long_for_minlimit == True) and l >= min_length) : 
-  	    if (cut_long_for_maxlimit == False):
-	        if l <= max_length:
-  	    	  tmp=w
-  	    	  i=1
-  	    else:
-  	    	  tmp=w[:max(min_length, max_length)]
- 	    	  i=1
-  	  elif (cut_long_for_minlimit == False):
-  	    tmp=w[:min(min_length, max_length)]
-  	    i=1
->>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
+      if ( (cut_long_for_minlimit == True) and l >= min_length) : 
+        if (cut_long_for_maxlimit == False):
+          if l <= max_length:
+            tmp=w
+            i=1
+        else:
+            tmp=w[:max(min_length, max_length)]            
+            i=1
+      elif (cut_long_for_minlimit == False):
+        tmp=w[:min(min_length, max_length)]
+        i=1
 
-  	  l = len(tmp)
-  	  do_swap = False
+      l = len(tmp)
+      do_swap = False
 
-  	  if swap == True:
-  	    if ease_swap == True:
-  	      do_swap = random.randint(0,3) >= 2
-  	    else:
-  	      do_swap = True
+      if swap == True:
+        if ease_swap == True:
+          do_swap = random.randint(0,3) >= 2
+        else:
+          do_swap = True
       
         
-  	  if swap == True and l>4 and do_swap == True:
-  	    #Dout ("D")  
+      if swap == True and l>3 and do_swap == True:
+        tmp = ScrableWord(tmp)
 
-        # allow swapping all but first and last chars, if long enough
-  	    if l-2 > 0:
-  	      ma=random.randint(1, l-2)
-  	      mi=random.randint(1, l-2)
-  	    else:
-  	      ma = 0
-  	      mi = 0
-
-  	    if ma < mi:
-  	      tma=ma
-  	      ma=mi
-  	      mi=tma
-        
-  	    if ma != mi and mi<l and ma>0:
-  	      tchr = tmp[:mi]
-  	      tchr += tmp[ma]
-  	      tchr += tmp[mi+1:ma]
-  	      tchr += tmp[mi]
-  	      tchr += tmp[ma+1:]
-  	      tmp = tchr
-          #if len (tmp) == 0:
-            #i=0
-            #Dout("-%s-%d  %s" % (tmp, len(tmp), w ) )
-            #continue
-
-  	  liner.append( tmp )
+      liner.append( tmp )
 
     if i > 0:
       contents += liner
@@ -303,9 +213,9 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
       if  con_length <= 1 : break
 
       if len(line) > 0:
-        line = line + " " + ScrableWord(element)
+        line = line + " " + element
       else:
-        line = ScrableWord(element)
+        line = element
       r += 1 
 
     result.append(line)
@@ -330,8 +240,12 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
    
 def ScrableWord(word):
   l = len(word)
-  s = random.randint(0, l-1)
-  e = random.randint(0, l-1)
+
+  if l <= 1:
+    return word
+
+  s = random.randint(1, l-1)
+  e = random.randint(0, l-2)
 
   if s >= e :
     return word
@@ -339,17 +253,19 @@ def ScrableWord(word):
   #Dout ("%d - %d"%  (s,e))
 
   w = word[0:s]
+  #w =''
 
 #There is no need to make a list. The following works for even-length strings:
 #http://stackoverflow.com/questions/4605439/what-is-the-simplest-way-to-swap-char-in-a-string-with-python#comment5061608_4605439
   r = ''
-  for i in range(s, e, 2) :
+  i = 1
+  for i in range(1, e-1, 2) :
     r += word[i + 1] + word[i]
   w += r
-
+  
 
 #  w = w + ''.join([ word[s:s+2][::-1] for x in range(0, e, 2) ])
-  w = w + word[e:]
+  w = w + word[i+2:l]
 
   return w
 
@@ -540,7 +456,7 @@ def main (default_urls=False):
     #print (data, options.wordscount, options.minword, options.maxword)
 
   randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.swap, options.ease_swap, options.fout)
-	
+  
 
 if __name__ == "__main__":
 
