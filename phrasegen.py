@@ -18,14 +18,14 @@ import urlparse
 import Queue
 import threading
 try:
-	from BeautifulSoup import BeautifulSoup, Comment
+  from BeautifulSoup import BeautifulSoup, Comment
 except ImportError, e:
-	print >> sys.stderr, "install BeautifulSoup"
-	sys.exit(1)
+  print >> sys.stderr, "install BeautifulSoup"
+  sys.exit(1)
 import time 
 
 class MyOpener (urllib.FancyURLopener):
-	version = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.15) Gecko/20131019 phrage-net.py/1.0.1'
+  version = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.15) Gecko/20131019 phrage-net.py/1.0.1'
 
 
 Newlines = re.compile (r'[\r\n]\s+')
@@ -35,41 +35,41 @@ queue_content = Queue.Queue ()
 queue_content_stilized = Queue.Queue ()
 
 def Dout(msg=None):
-	print (msg)
+  print (msg)
 
 class ThreadUrl (threading.Thread):
-	"""Threaded Url Grab"""
-	def __init__ (self, queue, out_queue):
-		  threading.Thread.__init__ (self)
-		  self.queue = queue
-		  self.out_queue = out_queue
+  """Threaded Url Grab"""
+  def __init__ (self, queue, out_queue):
+      threading.Thread.__init__ (self)
+      self.queue = queue
+      self.out_queue = out_queue
 
-	def run (self):
-		  while True:
-		      #grabs host from queue
-		      url=None
-		      text=""
-		      if self.queue != None:
-		        url = self.queue.get ()
+  def run (self):
+      while True:
+          #grabs host from queue
+          url=None
+          text=""
+          if self.queue != None:
+            url = self.queue.get ()
 
-		      try:
-		        if url != None:
-		          myopener = MyOpener ()
-		          #page = urllib.urlopen(url)
-		          page = myopener.open (url)
-		          Dout ("url %s" % url)
-		        if page:
-		          text = page.read ()
-		          page.close ()
-		      except Exception, e: 
-		        Dout (url + " "  + str(e))
+          try:
+            if url != None:
+              myopener = MyOpener ()
+              #page = urllib.urlopen(url)
+              page = myopener.open (url)
+              Dout ("url %s" % url)
+            if page:
+              text = page.read ()
+              page.close ()
+          except Exception, e: 
+            Dout (url + " "  + str(e))
 
 
-		      #place chunk into out queue
-		      self.out_queue.put (text)
+          #place chunk into out queue
+          self.out_queue.put (text)
 
-		      #signals to queue job is done
-		      self.queue.task_done ()
+          #signals to queue job is done
+          self.queue.task_done ()
 
 class DatamineThread(threading.Thread):
     """Threaded Url Grab"""
@@ -93,52 +93,52 @@ class DatamineThread(threading.Thread):
             self.out_queue.task_done()
 
 def fetch_url(url):
-	myopener = MyOpener()
-	#page = urllib.urlopen(url)
-	page = myopener.open(url)
-	 
-	text = page.read()
-	page.close()
-	return stilize_page(text)
+  myopener = MyOpener()
+  #page = urllib.urlopen(url)
+  page = myopener.open(url)
+   
+  text = page.read()
+  page.close()
+  return stilize_page(text)
 
 def stilize_page(text):
-	try:
-		bs = BeautifulSoup(text, convertEntities=BeautifulSoup.HTML_ENTITIES)
-		# kill javascript content
-		#for s in bs.findAll('script'):
-		#	  s.replaceWith('')
+  try:
+    bs = BeautifulSoup(text, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    # kill javascript content
+    #for s in bs.findAll('script'):
+    #   s.replaceWith('')
 
-		#for s in bs.findAll('img'):
-		#	  s.replaceWith('')
+    #for s in bs.findAll('img'):
+    #   s.replaceWith('')
 
-		#http://mail.python.org/pipermail/tutor/2007-July/055899.html
-		#remove unnecessary things (scripts, styles, ...)
-		for script in bs("script"):
-				bs.script.extract()
+    #http://mail.python.org/pipermail/tutor/2007-July/055899.html
+    #remove unnecessary things (scripts, styles, ...)
+    for script in bs("script"):
+        bs.script.extract()
 
-		for style in bs("style"):
-				bs.style.extract()
-			 
-		#remove comments
-		comments = bs.findAll(text=lambda text:isinstance(text, Comment))
-		[comment.extract() for comment in comments]
-	
-		#
+    for style in bs("style"):
+        bs.style.extract()
+       
+    #remove comments
+    comments = bs.findAll(text=lambda text:isinstance(text, Comment))
+    [comment.extract() for comment in comments]
+  
+    #
 
-		txt=None
-		# find body and extract text
-		if (bs.find('body') != None):
-			#print bs.originalEncoding
-			txt = bs.find('body').getText('\n')
-			#txt = bs.find('body').renderContents()
-			# remove multiple linebreaks and whitespace
-			return Newlines.sub('\n', txt)
-	except Exception, e:
-		msg = str(e) .join(" stilize_page")
-		print >> sys.stderr, msg
-		Dout (msg)
+    txt=None
+    # find body and extract text
+    if (bs.find('body') != None):
+      #print bs.originalEncoding
+      txt = bs.find('body').getText('\n')
+      #txt = bs.find('body').renderContents()
+      # remove multiple linebreaks and whitespace
+      return Newlines.sub('\n', txt)
+  except Exception, e:
+    msg = str(e) .join(" stilize_page")
+    print >> sys.stderr, msg
+    Dout (msg)
 
-	return None
+  return None
 
 def Dout(msg, level=5):
   print (msg)
@@ -153,19 +153,19 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
     i=0
     if line == None: continue
     for w in line.split():
-  	  l = len(w)
-  	  
-  	  if ( (cut_long_for_minlimit == True) and l >= min_length) : 
-  	    if (cut_long_for_maxlimit == False):
-	        if l <= max_length:
-  	    	  liner.append(w)
-  	    	  i=1
-  	    else:
- 	    	  liner.append(w[:max(min_length, max_length)])
- 	    	  i=1
-  	  elif (cut_long_for_minlimit == False):
-  	    liner.append(w[:min(min_length, max_length)])
-  	    i=1
+      l = len(w)
+      
+      if ( (cut_long_for_minlimit == True) and l >= min_length) : 
+        if (cut_long_for_maxlimit == False):
+          if l <= max_length:
+            liner.append(w)
+            i=1
+        else:
+          liner.append(w[:max(min_length, max_length)])
+          i=1
+      elif (cut_long_for_minlimit == False):
+        liner.append(w[:min(min_length, max_length)])
+        i=1
 
     if i > 0:
       contents += liner
@@ -186,9 +186,9 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
       #contents.remove(element)
 
       if len(line) > 0:
-        line = line + " " + element
+        line = line + " " + ScrableWord(element)
       else:
-        line = element
+        line = ScrableWord(element)
       r += 1 
     
     result.append(line)
@@ -196,21 +196,45 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
   if fout!=None:
     out=open(fout, "w")
     for r in result:
-			try:
-			  out.write(r +"\n")
-			except Exception, e:
-			  pass
+      try:
+        out.write(r +"\n")
+      except Exception, e:
+        pass
     out.close()
   else:
     for r in result:
       try:
         Dout (unicode(r))
       except UnicodeEncodeError, e:
- 	#print >> sys.stderr, str(e)
+  #print >> sys.stderr, str(e)
         pass
       except UnicodeDecodeError, e:
         pass
    
+def ScrableWord(word):
+  l = len(word)
+  s = random.randint(0, l-1)
+  e = random.randint(0, l-1)
+
+  if s >= e :
+    return word
+
+  #Dout ("%d - %d"%  (s,e))
+
+  w = word[0:s]
+
+#There is no need to make a list. The following works for even-length strings:
+#http://stackoverflow.com/questions/4605439/what-is-the-simplest-way-to-swap-char-in-a-string-with-python#comment5061608_4605439
+  r = ''
+  for i in range(s, e, 2) :
+    r += word[i + 1] + word[i]
+  w += r
+
+
+#  w = w + ''.join([ word[s:s+2][::-1] for x in range(0, e, 2) ])
+  w = w + word[e:]
+
+  return w
 
 
 
@@ -231,11 +255,11 @@ def main (default_urls=False):
                     type="int", help="Maximum word length")
 
   parser.add_option ( "--dont-cut-long-for-maxlimit", dest="cut_long_for_maxlimit", default=True,
-  									action="store_false",
+                    action="store_false",
                     help="Default: cut long words to meet maxlimit")
                     
   parser.add_option ( "--cut-long-for-minlimit", dest="cut_long_for_minlimit", default=True,
-  									action="store_false",
+                    action="store_false",
                     help="False: cut long words to make them shorter. True: use words not shorter than minword limit.")
   
   parser.add_option ( "--urls", dest="urls", default=None, action="store", type="string",
@@ -343,7 +367,7 @@ def main (default_urls=False):
 
       #Dout("Thread count: %d" % urlcount)
 
-		  #spawn a pool of threads, and pass them queue instance
+      #spawn a pool of threads, and pass them queue instance
       for i in range(urlcount):
           t = ThreadUrl (queue_urls, queue_content)
           thethreads.append(t)
@@ -357,7 +381,7 @@ def main (default_urls=False):
         t.stop()
 
     for u in local_urls:
-	    queue_urls.put (u.strip())
+      queue_urls.put (u.strip())
 
     try:
 
@@ -377,13 +401,13 @@ def main (default_urls=False):
 
     starttime = time.time()
 
-    while	 queue_content_stilized.empty() != True:
-			data.append (queue_content_stilized.get())
-			if  time.time()-starttime > 25:
-			  for t in thethreads:
-			    t.terminate()
-			  Dout("Timeout")
-			  sys.exit(100)  
+    while  queue_content_stilized.empty() != True:
+      data.append (queue_content_stilized.get())
+      if  time.time()-starttime > 25:
+        for t in thethreads:
+          t.terminate()
+        Dout("Timeout")
+        sys.exit(100)  
         
 
     #for u in options.urls.split():
@@ -392,7 +416,7 @@ def main (default_urls=False):
     #print (data, options.wordscount, options.minword, options.maxword)
 
   randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.fout)
-	
+  
 
 if __name__ == "__main__":
 
