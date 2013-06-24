@@ -3,9 +3,12 @@
 #
 # Phrase generator (phrasegen) for creating random(?) password phrases from given input, file or urls.
 #
-# Copyright (C) 2012 Jani Päijänen, jani dot paijanen [at] gmail dot com
-# License: Freeware. 
-# Please consider making a donation to some local charity program near you.
+# Copyright (C) 2012 Jani Päijänen
+# All rights reserved.
+#  
+# License: Simplified BSD License
+#
+#
 
 
 import random
@@ -17,6 +20,9 @@ import urllib
 import urlparse
 import Queue
 import threading
+import re
+
+
 try:
   from BeautifulSoup import BeautifulSoup, Comment
 except ImportError, e:
@@ -38,6 +44,7 @@ def Dout(msg=None):
   print (msg)
 
 class ThreadUrl (threading.Thread):
+<<<<<<< HEAD
   """Threaded Url Grab"""
   def __init__ (self, queue, out_queue):
       threading.Thread.__init__ (self)
@@ -70,6 +77,43 @@ class ThreadUrl (threading.Thread):
 
           #signals to queue job is done
           self.queue.task_done ()
+=======
+	"""Threaded Url Grab"""
+	def __init__ (self, queue, out_queue):
+		  threading.Thread.__init__ (self)
+		  self.queue = queue
+		  self.out_queue = out_queue
+
+		  #Dout ("ThreadURL %s" % u"constructor")
+
+	def run (self):
+		  while True:
+		      #grabs host from queue
+		      url=None
+		      text=""
+		      if self.queue != None:
+		        url = self.queue.get ()
+
+		      try:
+		        if url != None:
+		          #Dout ("ThreadURL %s" % url)
+		          myopener = MyOpener ()
+		          #page = urllib.urlopen(url)
+		          page = myopener.open (url)
+		          
+		        if page:
+		          text = page.read ()
+		          page.close ()
+		      except Exception, e: 
+		        Dout (url + " "  + str(e))
+
+
+		      #place chunk into out queue
+		      self.out_queue.put (text)
+
+		      #signals to queue job is done
+		      self.queue.task_done ()
+>>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
 
 class DatamineThread(threading.Thread):
     """Threaded Url Grab"""
@@ -93,6 +137,7 @@ class DatamineThread(threading.Thread):
             self.out_queue.task_done()
 
 def fetch_url(url):
+<<<<<<< HEAD
   myopener = MyOpener()
   #page = urllib.urlopen(url)
   page = myopener.open(url)
@@ -100,6 +145,15 @@ def fetch_url(url):
   text = page.read()
   page.close()
   return stilize_page(text)
+=======
+	myopener = MyOpener()
+	#page = urllib.urlopen(url)
+	page = myopener.open(url)
+	  
+	text = page.read()
+	page.close()
+	return stilize_page(text)
+>>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
 
 def stilize_page(text):
   try:
@@ -144,13 +198,13 @@ def Dout(msg, level=5):
   print (msg)
   pass
 
-def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, db=None, fout=None):
+def randomize_filecontents(data, words_count, min_length, max_length, cut_long_for_maxlimit, cut_long_for_minlimit, swap=False, ease_swap=False, db=None, fout=None):
 
   contents = []
-  #Dout data
   for line in data:
     liner = []
     i=0
+<<<<<<< HEAD
     if line == None: continue
     for w in line.split():
       l = len(w)
@@ -166,6 +220,70 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
       elif (cut_long_for_minlimit == False):
         liner.append(w[:min(min_length, max_length)])
         i=1
+=======
+    if line == None : continue    
+
+    line = re.sub("\s\s+" , " ", line)
+
+    if len(line) == 0: continue
+
+    tmp = ""
+    for w in line.strip().split():
+  	  l = len(w)
+  	  if l == 0: continue
+
+  	  if ( (cut_long_for_minlimit == True) and l >= min_length) : 
+  	    if (cut_long_for_maxlimit == False):
+	        if l <= max_length:
+  	    	  tmp=w
+  	    	  i=1
+  	    else:
+  	    	  tmp=w[:max(min_length, max_length)]
+ 	    	  i=1
+  	  elif (cut_long_for_minlimit == False):
+  	    tmp=w[:min(min_length, max_length)]
+  	    i=1
+>>>>>>> 401e64f3ad9653accf5460fa6446b0929e62dd20
+
+  	  l = len(tmp)
+  	  do_swap = False
+
+  	  if swap == True:
+  	    if ease_swap == True:
+  	      do_swap = random.randint(0,3) >= 2
+  	    else:
+  	      do_swap = True
+      
+        
+  	  if swap == True and l>4 and do_swap == True:
+  	    #Dout ("D")  
+
+        # allow swapping all but first and last chars, if long enough
+  	    if l-2 > 0:
+  	      ma=random.randint(1, l-2)
+  	      mi=random.randint(1, l-2)
+  	    else:
+  	      ma = 0
+  	      mi = 0
+
+  	    if ma < mi:
+  	      tma=ma
+  	      ma=mi
+  	      mi=tma
+        
+  	    if ma != mi and mi<l and ma>0:
+  	      tchr = tmp[:mi]
+  	      tchr += tmp[ma]
+  	      tchr += tmp[mi+1:ma]
+  	      tchr += tmp[mi]
+  	      tchr += tmp[ma+1:]
+  	      tmp = tchr
+          #if len (tmp) == 0:
+            #i=0
+            #Dout("-%s-%d  %s" % (tmp, len(tmp), w ) )
+            #continue
+
+  	  liner.append( tmp )
 
     if i > 0:
       contents += liner
@@ -179,18 +297,17 @@ def randomize_filecontents(data, words_count, min_length, max_length, cut_long_f
     r = 0
     while r < words_count:
       index = random.randint(0, con_length-1)
-      #element = random.choice(contents)
+      
       element = contents.pop(index)
       con_length = len(contents)
       if  con_length <= 1 : break
-      #contents.remove(element)
 
       if len(line) > 0:
         line = line + " " + ScrableWord(element)
       else:
         line = ScrableWord(element)
       r += 1 
-    
+
     result.append(line)
 
   if fout!=None:
@@ -273,6 +390,13 @@ def main (default_urls=False):
 
   parser.add_option ( "--stdin", dest="stdin", default=False, 
                     action="store_true", help="Read from stdin")
+
+  parser.add_option ( "--no-swap", dest="swap", default=True, 
+                    action="store_false", help="Do not swap random chars")
+
+  parser.add_option ( "--no-ease_swap", dest="ease_swap", default=True, 
+                    action="store_false", help="Do not swap only chars of some words")
+
 
   parser.add_option ( "--fout", dest="fout", default=None, 
                     action="store", type="string", help="File out")
@@ -415,8 +539,8 @@ def main (default_urls=False):
     #  data.append ( fetch_url(u))
     #print (data, options.wordscount, options.minword, options.maxword)
 
-  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.fout)
-  
+  randomize_filecontents (data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit,  options.swap, options.ease_swap, options.fout)
+	
 
 if __name__ == "__main__":
 
