@@ -347,13 +347,13 @@ def main (default_urls=False):
                     help="file contents to randomize")
 
   parser.add_option ( "--wordscount", dest="wordscount", default=5,
-                    type="int", help="Count of words in phrase.")
+                    type="int", help="Count of words in phrase. Default = 5")
 
-  parser.add_option ( "--minword", dest="minword", default=2,
-                    type="int", help="Minimum word length")
+  parser.add_option ( "--minword", dest="minword", default=3,
+                    type="int", help="Minimum word length. Default = 3")
 
   parser.add_option ( "--maxword", dest="maxword", default=17,
-                    type="int", help="Maximum word length")
+                    type="int", help="Maximum word length. Default = 17")
 
   parser.add_option ( "--dont-cut-long-for-maxlimit", dest="cut_long_for_maxlimit", default=True,
                     action="store_false",
@@ -373,7 +373,7 @@ def main (default_urls=False):
                     action="store_true", help="Read from stdin")
 
   parser.add_option ( "--scramble-force", dest="scramble_force", default=False, 
-                      action="store_false", help="Always swap position of word's letters, but first and last. 70% of words. Applies to word length > 3. Default=False")
+                      action="store_false", help="Always swap position of word's letters, but first and last. Applies to word length > 3. Default=False")
 
   parser.add_option ( "--scramble-random", dest="scramble_random", default=True, 
                     action="store_true", help="Swap position of word's letters, but first and last. 70% of words. Applies to word length > 3. Default=True")
@@ -398,23 +398,23 @@ def main (default_urls=False):
     urls_list = []
     urls_list.append ("https://fi.wikipedia.org/wiki/Special:Random")
     urls_list.append ("http://hikipedia.info/wiki/Toiminnot:Satunnainen_sivu")
-    urls_list.append ("http://www.gutenberg.org/files/7000/7000-h/7000-h.htm")
+    #urls_list.append ("http://www.gutenberg.org/files/7000/7000-h/7000-h.htm")
     urls_list.append ("https://fi.wikipedia.org/wiki/Luettelo_E-koodatuista_aineista")
-    urls_list.append ("https://se.wikipedia.org/wiki/Special:Random")
-    urls_list.append ("https://de.wikipedia.org/wiki/Special:Random")
+    #urls_list.append ("https://se.wikipedia.org/wiki/Special:Random")
+    #urls_list.append ("https://de.wikipedia.org/wiki/Special:Random")
     urls_list.append ("https://en.wikipedia.org/wiki/Special:Random")
     urls_list.append ("http://en.wikiquote.org/wiki/Special:Random")
     urls_list.append ("http://fi.wikiquote.org/wiki/Special:Random")
     urls_list.append ("http://se.wikiquote.org/wiki/Special:Random")
-    urls_list.append ("http://de.wikiquote.org/wiki/Special:Random" )
-    urls_list.append ("https://en.wikipedia.org/wiki/Wikipedia:List_of_all_single-digit-single-letter_combinations")
-    urls_list.append ("https://en.wikipedia.org/wiki/List_of_medical_roots,_suffixes_and_prefixes")
-    urls_list.append ("https://en.wikipedia.org/wiki/List_of_abbreviations_used_in_medical_prescriptions")
-    urls_list.append ("https://en.wikipedia.org/wiki/Acronyms_in_healthcare")
-    urls_list.append ("https://en.wikipedia.org/wiki/E_number")
+    #urls_list.append ("http://de.wikiquote.org/wiki/Special:Random" )
+    #urls_list.append ("https://en.wikipedia.org/wiki/Wikipedia:List_of_all_single-digit-single-letter_combinations")
+    #urls_list.append ("https://en.wikipedia.org/wiki/List_of_medical_roots,_suffixes_and_prefixes")
+    #urls_list.append ("https://en.wikipedia.org/wiki/List_of_abbreviations_used_in_medical_prescriptions")
+    #urls_list.append ("https://en.wikipedia.org/wiki/Acronyms_in_healthcare")
+    #urls_list.append ("https://en.wikipedia.org/wiki/E_number")
     urls_list.append ("https://en.wikipedia.org/wiki/List_of_food_additives,_Codex_Alimentarius")
     urls_list.append ("https://en.wikipedia.org/wiki/List_of_food_additives")
-    urls_list.append ("https://en.wikipedia.org/wiki/Wikipedia:List_of_all_single-letter-double-digit_combinations")
+    #urls_list.append ("https://en.wikipedia.org/wiki/Wikipedia:List_of_all_single-letter-double-digit_combinations")
     urls_list.append ("http://www.hs.fi")
     urls_list.append ("http://www.ksml.fi")
     urls_list.append ("http://www.ilkka.fi")
@@ -428,9 +428,10 @@ def main (default_urls=False):
   if options.randomizefile == None and options.stdin == False and urls == None and options.urls ==None:
  #options.urls == None :
     parser.print_help()
-    print ("Phrase generator (phrage) for creating random(?) password phrases from given URLs.")
-    print ("Try either row from below to see how it works. ")
-    print (' egrep -v "^[ ]*$|^#" "phrasegen.py" | grep -v ===  | phrasegen.py --stdin --maxword=13 --wordscount=8 --minword=3 --dont-cut-long-for-maxlimit | sed s@\ @@g | cut -c 1-32')
+    print ("Phrase generator (phrage) for creating password phrases from given input")
+    print (' #  egrep -v "^[ ]*$|^#" "phrasegen.py" | grep -v ===  | ./phrasegen.py --stdin --maxword=13 --wordscount=8 --minword=3 --dont-cut-long-for-maxlimit | sed s@\ @@g | cut -c 1-32')
+    print (' # ./phrasegen.py  -d --scramble-random')
+
 
   data = []
 
@@ -445,15 +446,18 @@ def main (default_urls=False):
     #randomize_filecontents(data, options.wordscount, options.minword, options.maxword, options.cut_long_for_maxlimit, options.cut_long_for_minlimit)
   elif options.urls != None or urls_list != None:
     thethreads = []
-    local_urls = ""
+    local_urls = []
 
     if options.urls != None:
       local_urls = options.urls.split()
 
     if urls_list != None:
+      print local_urls
+      print urls_list
 
       for u in urls_list:
         local_urls = local_urls + u.split()
+      #local_urls = local_urls + urls_list[0]
 
     urlcount = len(local_urls)
 
