@@ -425,8 +425,7 @@ def main (default_urls=False):
     urls_list.append ("http://www.maaseuduntulevaisuus.fi")    
     random.shuffle(urls_list)
 
-  if options.randomizefile == None and options.stdin == False and urls == None and options.urls ==None:
- #options.urls == None :
+  if options.randomizefile == None and options.stdin == False and urls == None and options.urls == None and options.default_urls == None:
     parser.print_help()
     print ("Phrase generator (phrage) for creating password phrases from given input")
     print (' #  egrep -v "^[ ]*$|^#" "phrasegen.py" | grep -v ===  | ./phrasegen.py --stdin --maxword=13 --wordscount=8 --minword=3 --dont-cut-long-for-maxlimit | sed s@\ @@g | cut -c 1-32')
@@ -452,8 +451,8 @@ def main (default_urls=False):
       local_urls = options.urls.split()
 
     if urls_list != None:
-      print local_urls
-      print urls_list
+      #print local_urls
+      #print urls_list
 
       for u in urls_list:
         local_urls = local_urls + u.split()
