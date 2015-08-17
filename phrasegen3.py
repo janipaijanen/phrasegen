@@ -274,7 +274,7 @@ def randomize_filecontents(data,  min_length, max_length, cut_long_for_maxlimit,
 
 def do_writefile (result, fout, wordcount, replace_spaces):
   output = io.StringIO()
-  re_len = len(replace_spaces)-1
+  re_len = len(replace_spaces)-1 if replace_spaces is not None else -1
 
   i=0
   for r in result:
@@ -291,7 +291,7 @@ def do_writefile (result, fout, wordcount, replace_spaces):
         logger.debug( type(mychr))
         output.write(mychr)
       else:
-        output.write(" ")
+        output.write(u" ")
     
   if i>0:
     output.write(u"\n")
@@ -404,14 +404,14 @@ def main (default_urls=False):
     ##urls_list.append ("https://en.wikipedia.org/wiki/List_of_food_additives,_Codex_Alimentarius")
     ##urls_list.append ("https://en.wikipedia.org/wiki/List_of_food_additives")
     ##urls_list.append ("https://en.wikipedia.org/wiki/Wikipedia:List_of_all_single-letter-double-digit_combinations")
-    #urls_list.append ("http://www.hs.fi")
-    #urls_list.append ("http://www.ksml.fi")
-    #urls_list.append ("http://www.ilkka.fi")
-    #urls_list.append ("http://www.turunsanomat.fi")
+    urls_list.append ("http://www.hs.fi")
+    urls_list.append ("http://www.ksml.fi")
+    urls_list.append ("http://www.ilkka.fi")
+    urls_list.append ("http://www.turunsanomat.fi")
     #urls_list.append ("http://www.parikkalan-rautjarvensanomat.fi")
     #urls_list.append ("http://www.saynatsalonsanomat.fi")
-    #urls_list.append ("http://www.kaleva.fi")
-    #urls_list.append ("http://www.maaseuduntulevaisuus.fi")    
+    urls_list.append ("http://www.kaleva.fi")
+    urls_list.append ("http://www.maaseuduntulevaisuus.fi")    
     random.shuffle(urls_list)
 
   if options.randomizefile == None and options.stdin == False and urls == None and options.urls == None and options.default_urls == None:
